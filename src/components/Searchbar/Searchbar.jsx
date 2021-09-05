@@ -1,50 +1,42 @@
-import React, { Component } from 'react';
+import React, { useState } from 'react';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-// import PropTypes from 'prop-types';
 
-export class Searchbar extends Component {
-  state = {
-    imageName: '',
-  };
+export default function Searchbar({ onSubmit }) {
+  const [imageName, setImageName] = useState('');
 
-  handleNameChange = event => {
-    this.setState({ imageName: event.currentTarget.value.toLowerCase() });
-  };
+  const handleNameChange = event =>
+    setImageName(event.currentTarget.value.toLowerCase());
 
-  handleSabmit = event => {
+  const handleSabmit = event => {
     event.preventDefault();
 
-    if (this.state.imageName.trim() === '') {
+    if (imageName.trim() === '') {
       toast.error('Enter a name for the picture!');
       return;
     }
-    this.props.onSubmit(this.state.imageName);
-    this.setState({ imageName: '' });
+    onSubmit(imageName);
+    setImageName('');
   };
 
-  render() {
-    return (
-      <header className="Searchbar">
-        <form className="SearchForm" onSubmit={this.handleSabmit}>
-          <button type="submit" className="SearchForm-button">
-            <span className="SearchForm-button-label">Search</span>
-          </button>
+  return (
+    <header className="Searchbar">
+      <form className="SearchForm" onSubmit={handleSabmit}>
+        <button type="submit" className="SearchForm-button">
+          <span className="SearchForm-button-label">Search</span>
+        </button>
 
-          <input
-            className="SearchForm-input"
-            type="text"
-            name="imageName"
-            // autocomplete="off"
-            // autofocus
-            placeholder="Search images and photos"
-            value={this.state.imageName}
-            onChange={this.handleNameChange}
-          />
-        </form>
-      </header>
-    );
-  }
+        <input
+          className="SearchForm-input"
+          type="text"
+          name="imageName"
+          // autocomplete="off"
+          // autofocus
+          placeholder="Search images and photos"
+          value={imageName}
+          onChange={handleNameChange}
+        />
+      </form>
+    </header>
+  );
 }
-
-export default Searchbar;

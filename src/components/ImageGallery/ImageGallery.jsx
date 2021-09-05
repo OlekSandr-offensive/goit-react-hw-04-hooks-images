@@ -1,30 +1,50 @@
-import React, { Component } from 'react';
+import React from 'react';
 import ImageGalleryItem from '../ImageGalleryItem';
 import PropTypes from 'prop-types';
 
-export class ImageGallery extends Component {
-  render() {
-    const { images, largeImg } = this.props;
-
-    return (
-      <>
-        <ul className="ImageGallery">
-          {images.map(image => {
-            return (
-              <ImageGalleryItem
-                key={image.id}
-                image={image}
-                largeImg={() => {
-                  largeImg(image.largeImageURL);
-                }}
-              />
-            );
-          })}
-        </ul>
-      </>
-    );
-  }
+export default function ImageGallery({ images, largeImg }) {
+  return (
+    <>
+      <ul className="ImageGallery">
+        {images.map(image => {
+          return (
+            <ImageGalleryItem
+              key={image.id}
+              image={image}
+              largeImg={() => {
+                largeImg(image.largeImageURL);
+              }}
+            />
+          );
+        })}
+      </ul>
+    </>
+  );
 }
+
+// export class OldImageGallery extends Component {
+//   render() {
+//     const { images, largeImg } = this.props;
+
+//     return (
+//       <>
+//         <ul className="ImageGallery">
+//           {images.map(image => {
+//             return (
+//               <ImageGalleryItem
+//                 key={image.id}
+//                 image={image}
+//                 largeImg={() => {
+//                   largeImg(image.largeImageURL);
+//                 }}
+//               />
+//             );
+//           })}
+//         </ul>
+//       </>
+//     );
+//   }
+// }
 
 ImageGallery.propTypes = {
   largeImg: PropTypes.func.isRequired,
@@ -37,4 +57,4 @@ ImageGallery.propTypes = {
   ),
 };
 
-export default ImageGallery;
+// export default ImageGallery;
