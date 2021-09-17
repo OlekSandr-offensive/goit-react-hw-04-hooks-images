@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import Loader from 'react-loader-spinner';
 import 'react-loader-spinner/dist/loader/css/react-spinner-loader.css';
 import { ToastContainer } from 'react-toastify';
+import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import './App.scss';
 import Searchbar from '../Searchbar/Searchbar';
@@ -9,6 +10,7 @@ import Button from '../Button/Button';
 import ImageGallery from '../ImageGallery';
 import ImageError from '../ImageError';
 import Modal from '../Modal';
+import imageAPI from '../../services/ImageApi';
 
 const Status = {
   IDLE: 'idle',
@@ -17,34 +19,23 @@ const Status = {
   REJECTED: 'rejected',
 };
 
-const API_KEY = '21988624-a694c57feb3b9caad270c2fa0';
-const BASE_URL = 'https://pixabay.com/api';
-
 export default function App() {
   const [imageName, setImageName] = useState('');
   const [images, setImages] = useState([]);
   const [error, setError] = useState(null);
   const [largeImg, setLargeImg] = useState(null);
-  const [page, setPage] = useState(0);
+  const [page, setPage] = useState(1);
   const [status, setStatus] = useState(Status.IDLE);
+  const [currentName, setCurrentName] = useState('');
 
-  const fetchImage = useCallback(() => {
-    fetch(
-      `${BASE_URL}/?q=${imageName}&page=${page}&key=${API_KEY}&image_type=photo&orientation=horizontal&per_page=12`,
-    )
-      .then(response => {
-        if (response.ok) {
-          return response.json().then(data => data.hits);
-        }
-      })
+  const fetchApi = useCallback(() => {
+    imageAPI
+      .fetchImage(currentName, page)
       .then(result => {
+        setImageName('');
         setStatus(Status.RESOLVED);
-        if (page === 1) {
-          setImages([...result]);
-        } else {
-          setImages(prevImages => setImages([...prevImages, ...result]));
-        }
-
+        setImages(images => [...images, ...result]);
+        setPage(page => page + 1);
         if (!result.length) {
           setError(`  No picture with name :  ${imageName}`);
           setStatus(Status.REJECTED);
@@ -59,16 +50,29 @@ export default function App() {
       .finally(() => {
         myScroll();
       });
-  }, [setStatus, setError, setImages, imageName, page]);
+  }, [setStatus, setError, setImages, imageName, page, currentName]);
 
   useEffect(() => {
     if (!imageName) {
       return;
     }
-    console.log(imageName);
+
     setStatus(Status.PENDING);
-    fetchImage();
-  }, [imageName, fetchImage]);
+    setCurrentName(imageName);
+    if (imageName === currentName) {
+      fetchApi(imageName, page);
+    }
+  }, [imageName, fetchApi, page, currentName]);
+
+  const handleFormSubmit = newImage => {
+    if (newImage !== currentName) {
+      setImageName(newImage);
+      setImages([]);
+      setPage(1);
+    } else {
+      toast.error('This text has already been found!');
+    }
+  };
 
   const handlerClickImage = url => {
     return setLargeImg(url);
@@ -81,16 +85,9 @@ export default function App() {
     });
   };
 
-  const loadMoreHandler = () => setPage(page + 1);
-
-  const handleSearchImages = namePicture => {
-    setImageName(namePicture);
-    setPage(1);
-  };
-
   return (
     <div className="App">
-      <Searchbar onSubmit={handleSearchImages} />
+      <Searchbar onSubmit={handleFormSubmit} />
       <ToastContainer autoClose={3000} />
 
       {status === Status.IDLE ? <div>Enter a name for the picture</div> : null}
@@ -110,7 +107,7 @@ export default function App() {
       {status === Status.RESOLVED ? (
         <>
           <ImageGallery images={images} largeImg={handlerClickImage} />
-          <Button onClick={loadMoreHandler} />
+          <Button onClick={fetchApi} />
         </>
       ) : null}
       {largeImg && (
