@@ -9,6 +9,7 @@ function fetchImage(imageName, page) {
       return response.json().then(data => data.hits);
     }
   });
+  //header
 }
 
 const imageAPI = { fetchImage };
