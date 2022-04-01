@@ -43,7 +43,7 @@ export default function App() {
           setError(null);
         }
       })
-      .catch(error => {
+      .catch(() => {
         setError(` No picture with name :  ${imageName}`);
         setStatus(Status.REJECTED);
       })
