@@ -1,5 +1,4 @@
 import { useEffect } from 'react';
-// import PropTypes from "prop-types";
 import { createPortal } from 'react-dom';
 const modalRoot = document.querySelector('#modal-root');
 
@@ -26,7 +25,5 @@ const Modal = props => {
     modalRoot,
   );
 };
-Modal.propTypes = {
-  // onClick: PropTypes.func.isRequired,
-};
+
 export default Modal;
